@@ -1,0 +1,32 @@
+replicaCount: 1
+
+image:
+  repository: zvlb/log-spammer
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "latest"
+
+imagePullSecrets:
+  - name: regcred
+
+# imageCredentials: 
+#   registry: soms
+#   username: someone
+#   password: sillyness
+#   email: someone@host.com
+
+nameOverride: ""
+fullnameOverride: ""
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 100Mi
+  requests:
+    cpu: 10m
+    memory: 80Mi
+
+envs: 
+  MESSAGE_PER_SECOND: 100
+  MESSAGE_SIZE_FROM: 50
+  MESSAGE_SIZE_TO: 100
