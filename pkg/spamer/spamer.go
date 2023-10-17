@@ -1,6 +1,7 @@
 package spamer
 
 import (
+	"context"
 	"fmt"
 	"math/rand"
 	"time"
@@ -13,7 +14,10 @@ import (
 func Spamer(cfg config.Config) {
 	sleepMS := getMSSleepCount(cfg.PerSecond)
 
-	ctx := cfg.Context()
+	ctx, cansel := context.WithCancel(context.Background())
+	defer cansel()
+
+	counter := 1
 
 	for {
 		select {
@@ -23,6 +27,12 @@ func Spamer(cfg config.Config) {
 		default:
 			zlog.Info().Msg(createMessage(cfg.SizeFrom, cfg.SizeTo))
 			time.Sleep(time.Duration(sleepMS * 1000000))
+
+			if cfg.Limit != -1 && counter >= cfg.Limit {
+				cansel()
+			}
+
+			counter++
 		}
 	}
 

@@ -6,18 +6,18 @@ import (
 	"strconv"
 )
 
-func getEnv() (int, int, int, error) {
+func getEnv() (int, int, int, int, error) {
 	messagePerSecond := 100
 	messagePerSecondEnv, messagePerSecondHas := os.LookupEnv("MESSAGE_PER_SECOND")
 	if messagePerSecondHas {
 		messagePerSecondInt, err := strconv.Atoi(messagePerSecondEnv)
 		if err != nil {
-			return 0, 0, 0, errors.New("MESSAGE_PER_SECOND should be INT")
+			return 0, 0, 0, 0, errors.New("MESSAGE_PER_SECOND should be INT")
 		}
 		messagePerSecond = messagePerSecondInt
 	}
 	if messagePerSecond > 1000 {
-		return 0, 0, 0, errors.New("Environment 'MESSAGE_SIZE' can't be more then 1000")
+		return 0, 0, 0, 0, errors.New("Environment 'MESSAGE_SIZE' can't be more then 1000")
 	}
 
 	messageSize := -1
@@ -25,7 +25,7 @@ func getEnv() (int, int, int, error) {
 	if messageSizeHas {
 		messageSizeInt, err := strconv.Atoi(messageSizeEnv)
 		if err != nil {
-			return 0, 0, 0, errors.New("MESSAGE_SIZE should be INT")
+			return 0, 0, 0, 0, errors.New("MESSAGE_SIZE should be INT")
 		}
 		messageSize = messageSizeInt
 	}
@@ -35,7 +35,7 @@ func getEnv() (int, int, int, error) {
 	if messageSizeFromHas {
 		messageSizeFromInt, err := strconv.Atoi(messageSizeFromEnv)
 		if err != nil {
-			return 0, 0, 0, errors.New("MESSAGE_SIZE_FROM should be INT")
+			return 0, 0, 0, 0, errors.New("MESSAGE_SIZE_FROM should be INT")
 		}
 		messageSizeFrom = messageSizeFromInt
 	}
@@ -45,17 +45,27 @@ func getEnv() (int, int, int, error) {
 	if messageSizeToHas {
 		messageSizeToInt, err := strconv.Atoi(messageSizeToEnv)
 		if err != nil {
-			return 0, 0, 0, errors.New("MESSAGE_SIZE should be INT")
+			return 0, 0, 0, 0, errors.New("MESSAGE_SIZE should be INT")
 		}
 		messageSizeTo = messageSizeToInt
 	}
 
-	from, to, err := getSizeRange(messageSizeHas, messageSizeFromHas, messageSizeToHas, messageSize, messageSizeFrom, messageSizeTo)
-	if err != nil {
-		return 0, 0, 0, err
+	messageLimit := -1
+	messageLimitEnv, messageLimitHas := os.LookupEnv("MESSAGE_LIMIT")
+	if messageLimitHas {
+		messageLimitInt, err := strconv.Atoi(messageLimitEnv)
+		if err != nil {
+			return 0, 0, 0, 0, errors.New("MESSAGE_LIMIT should be INT")
+		}
+		messageLimit = messageLimitInt
 	}
 
-	return messagePerSecond, from, to, nil
+	from, to, err := getSizeRange(messageSizeHas, messageSizeFromHas, messageSizeToHas, messageSize, messageSizeFrom, messageSizeTo)
+	if err != nil {
+		return 0, 0, 0, 0, err
+	}
+
+	return messagePerSecond, from, to, messageLimit, nil
 
 }
 
